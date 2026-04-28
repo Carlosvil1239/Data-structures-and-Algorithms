@@ -1,0 +1,136 @@
+# Graphs
+
+class Graph:
+    def __init__(self):
+        self.adjacency_list = {}
+
+    def add_vertex(self, vertex):
+        if vertex not in self.adjacency_list:
+            self.adjacency_list[vertex] = []
+
+    def add_edge(self, u, v):
+        self.add_vertex(u)
+        self.add_vertex(v)
+
+        self.adjacency_list[u].append(v)
+        self.adjacency_list[v].append(u)
+
+    def add_directed_edge(self, u, v):
+        self.add_vertex(u)
+        self.add_vertex(v)
+
+        self.adjacency_list[u].append(v)
+
+    def bfs(self, start):
+        visited = set()
+        queue = [start]
+        order = []
+
+        while len(queue) > 0:
+            vertex = queue.pop(0)
+
+            if vertex not in visited:
+                visited.add(vertex)
+                order.append(vertex)
+
+                for neighbor in self.adjacency_list[vertex]:
+                    if neighbor not in visited:
+                        queue.append(neighbor)
+
+        return order
+
+    def dfs(self, start):
+        visited = set()
+        order = []
+
+        self._dfs_recursive(start, visited, order)
+
+        return order
+
+    def _dfs_recursive(self, vertex, visited, order):
+        visited.add(vertex)
+        order.append(vertex)
+
+        for neighbor in self.adjacency_list[vertex]:
+            if neighbor not in visited:
+                self._dfs_recursive(neighbor, visited, order)
+
+    def has_path(self, start, end):
+        visited = set()
+        return self._has_path_recursive(start, end, visited)
+
+    def _has_path_recursive(self, current, end, visited):
+        if current == end:
+            return True
+
+        visited.add(current)
+
+        for neighbor in self.adjacency_list[current]:
+            if neighbor not in visited:
+                if self._has_path_recursive(neighbor, end, visited):
+                    return True
+
+        return False
+
+    def print_graph(self):
+        for vertex in self.adjacency_list:
+            print(vertex, ":", self.adjacency_list[vertex])
+
+
+def dijkstra(graph, start):
+    distances = {}
+
+    for vertex in graph:
+        distances[vertex] = float("inf")
+
+    distances[start] = 0
+    visited = set()
+
+    while len(visited) < len(graph):
+        current = None
+        current_distance = float("inf")
+
+        for vertex in graph:
+            if vertex not in visited and distances[vertex] < current_distance:
+                current = vertex
+                current_distance = distances[vertex]
+
+        if current is None:
+            break
+
+        visited.add(current)
+
+        for neighbor, weight in graph[current]:
+            new_distance = distances[current] + weight
+
+            if new_distance < distances[neighbor]:
+                distances[neighbor] = new_distance
+
+    return distances
+
+
+if __name__ == "__main__":
+    graph = Graph()
+
+    graph.add_edge("A", "B")
+    graph.add_edge("A", "C")
+    graph.add_edge("B", "D")
+    graph.add_edge("C", "E")
+    graph.add_edge("D", "E")
+
+    graph.print_graph()
+
+    print(graph.bfs("A"))
+    print(graph.dfs("A"))
+    print(graph.has_path("A", "E"))
+    print(graph.has_path("A", "Z"))
+
+    weighted_graph = {
+        "A": [("B", 4), ("C", 2)],
+        "B": [("C", 1), ("D", 5)],
+        "C": [("D", 8), ("E", 10)],
+        "D": [("E", 2)],
+        "E": []
+    }
+
+    print(dijkstra(weighted_graph, "A"))
