@@ -56,59 +56,6 @@ def solve_avoiding_trips():
 
 
 
-def solve_office_party():
-    try:
-        while True:
-            n, p, capacity = map(int, input().split())
-            graph = [[] for _ in range(n)]
-            for _ in range(p):
-                a, b = map(int, input().split())
-                a -= 1
-                b -= 1
-                graph[a].append(b)
-                graph[b].append(a)
-            color = [-1] * n
-            options = []
-            for start in range(n):
-                if color[start] != -1:
-                    continue
-                q = deque([start])
-                color[start] = 0
-                count = [1, 0]
-                while q:
-                    node = q.popleft()
-                    for nxt in graph[node]:
-                        if color[nxt] == -1:
-                            color[nxt] = 1 - color[node]
-                            count[color[nxt]] += 1
-                            q.append(nxt)
-
-                options.append((count[0], count[1]))
-            dp = [False] * (capacity + 1)
-            dp[0] = True
-            for a, b in options:
-                new_dp = dp[:]
-
-                for current in range(capacity + 1):
-                    if not dp[current]:
-                        continue
-
-                    if current + a <= capacity:
-                        new_dp[current + a] = True
-
-                    if current + b <= capacity:
-                        new_dp[current + b] = True
-
-                dp = new_dp
-
-            ans = 0
-
-            for i in range(capacity + 1):
-                if dp[i]:
-                    ans = i
-            print(ans)
-    except EOFError:
-        pass
 
 
 def solve_ticket_office():
